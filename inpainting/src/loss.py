@@ -4,32 +4,6 @@ import torchvision.models as models
 import torch.functional as F
 import torch.nn.functional as Fn
 
-def LInhibit_loss(preds, gt):
-    weights = torch.cuda.FloatTensor([[-1,-1,-1],
-                           [-1, 9, -1],
-                           [-1,-1,-1]]) 
-
-    weights = weights.view(1,1,3,3).repeat(1,1,1,1)
-
-
-
-    preds_R = Fn.conv2d(preds[:,0,:,:].unsqueeze(1) , weights,padding=1)
-    preds_G = Fn.conv2d(preds[:,1,:,:].unsqueeze(1) , weights,padding=1)
-    preds_B = Fn.conv2d(preds[:,2,:,:].unsqueeze(1) , weights,padding=1)
-
-    preds_LI = torch.cat((preds_R,preds_G,preds_B),dim=1)
-
-    gt_R = Fn.conv2d(gt[:,0,:,:].unsqueeze(1) , weights,padding=1)
-    gt_G = Fn.conv2d(gt[:,1,:,:].unsqueeze(1) , weights,padding=1)
-    gt_B = Fn.conv2d(gt[:,2,:,:].unsqueeze(1) , weights,padding=1)
-
-    gt_LI = torch.cat((gt_R,gt_G,gt_B), dim=1)
-
-    L1_loss = nn.L1Loss()
-
-
-    return L1_loss(preds_LI , gt_LI)
-
 
 class AdversarialLoss(nn.Module):
     r"""

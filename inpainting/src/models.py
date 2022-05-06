@@ -4,7 +4,7 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.autograd import grad
 from .networks import InpaintGenerator, EdgeGenerator, Discriminator,Discriminator_edge,UNET_Discriminator,ASPP_Discriminator
-from .loss import AdversarialLoss, PerceptualLoss, StyleLoss, LInhibit_loss
+from .loss import AdversarialLoss, PerceptualLoss, StyleLoss
 
 
 class BaseModel(nn.Module):
@@ -286,12 +286,10 @@ class InpaintingModel(BaseModel):
             + self.config.FAKE_LOSS_WEIGHT * dis_fake_loss  
             + self.config.DISP_LOSS_WEIGHT * disp_loss) 
 
-        elif self.config.GAN_loss == 'rs_proposed':
+        elif self.config.GAN_loss == 'rs_proposed':         
             
             zero = torch.zeros_like(dis_real,requires_grad=False)            
             one = torch.ones_like(dis_fake,requires_grad = False)
-
-#           normal relativistic loss is not used for fake part since it is considered when calculating the loss    
 
             dis_real = torch.nn.ReLU()(1.0 + (dis_real - torch.mean(dis_fake)))
             dis_real_loss = torch.mean(torch.abs((dis_real - zero)))
@@ -314,8 +312,6 @@ class InpaintingModel(BaseModel):
             
             zero = torch.zeros_like(dis_real,requires_grad=False)            
             one = torch.ones_like(dis_fake,requires_grad = False)
-
-#           normal relativistic loss is not used for fake part since it is considered when calculating the loss    
 
             dis_real = torch.nn.ReLU()(1.0 + (dis_real - dis_fake))
             dis_real_loss = torch.mean(torch.abs((dis_real - zero)))
@@ -340,8 +336,6 @@ class InpaintingModel(BaseModel):
             
             zero = torch.zeros_like(dis_real,requires_grad=False)            
             one = torch.ones_like(dis_fake,requires_grad = False)
-
-#           normal relativistic loss is not used for fake part since it is considered when calculating the loss    
 
             dis_real = torch.nn.ReLU()(1.0 + (dis_real - torch.mean(dis_fake)))
             dis_real_loss = torch.mean(torch.abs((dis_real - zero)))
@@ -389,11 +383,9 @@ class InpaintingModel(BaseModel):
             one = torch.ones_like(dis_fake_enc,requires_grad = False)
 
 
-#            dis_real_enc = dis_real_enc
             dis_real_enc = torch.nn.ReLU()(1.0 + (dis_real_enc - torch.mean(dis_fake_enc)))
             dis_real_loss_enc = torch.mean(torch.abs((dis_real_enc - zero)))
             
-#            dis_fake_sel_enc = dis_fake_enc
             dis_fake_sel_enc = torch.nn.ReLU()(dis_fake_enc - torch.mean(dis_real_enc))
             dis_fake_sel_loss_enc = torch.mean(torch.abs(dis_fake_sel_enc - one))
 
@@ -536,18 +528,8 @@ class InpaintingModel(BaseModel):
 
 
         # generator l1 loss
-        if not self.config.LInhibit:
-            gen_l1_loss = self.l1_loss(outputs, images) * self.config.L1_LOSS_WEIGHT / torch.mean(masks)
-            gen_loss += gen_l1_loss
-
-        elif self.config.LInhibit:
-            gen_l1_loss = self.l1_loss(outputs, images) * self.config.L1_LOSS_WEIGHT / torch.mean(masks)
-            gen_loss += gen_l1_loss * 0.5
-
-  
-            gen_lin_loss = LInhibit_loss(outputs, images) * self.config.L1_LOSS_WEIGHT / torch.mean(masks)
-            gen_loss += gen_lin_loss * 0.5
-
+        gen_l1_loss = self.l1_loss(outputs, images) * self.config.L1_LOSS_WEIGHT / torch.mean(masks)
+        gen_loss += gen_l1_loss
 
 
         # generator perceptual loss
