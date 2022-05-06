@@ -247,12 +247,6 @@ class InpaintingModel(BaseModel):
         elif self.config.GAN_loss == 'rs_proposed_unet':
             dis_real, dis_real_enc = self.discriminator(dis_input_real)                    # in: [rgb(3)]
             dis_fake, dis_fake_enc = self.discriminator(dis_input_fake)                    # in: [rgb(3)]
-        elif self.config.GAN_loss == 'rs_proposed_sample':
-            dis_real, dis_real_enc = self.discriminator(dis_input_real)                    # in: [rgb(3)]
-            dis_fake, dis_fake_enc = self.discriminator(dis_input_fake)                    # in: [rgb(3)]
-        elif self.config.GAN_loss == 'rs_proposed_sample_noavg':
-            dis_real, dis_real_enc = self.discriminator(dis_input_real)                    # in: [rgb(3)]
-            dis_fake, dis_fake_enc = self.discriminator(dis_input_fake)                    # in: [rgb(3)]
         else:
             dis_real, _ = self.discriminator(dis_input_real)                    # in: [rgb(3)]
             dis_fake, _ = self.discriminator(dis_input_fake)                    # in: [rgb(3)]
@@ -286,29 +280,7 @@ class InpaintingModel(BaseModel):
             + self.config.FAKE_LOSS_WEIGHT * dis_fake_loss  
             + self.config.DISP_LOSS_WEIGHT * disp_loss) 
 
-        elif self.config.GAN_loss == 'rs_proposed':         
-            
-            zero = torch.zeros_like(dis_real,requires_grad=False)            
-            one = torch.ones_like(dis_fake,requires_grad = False)
-
-            dis_real = torch.nn.ReLU()(1.0 + (dis_real - torch.mean(dis_fake)))
-            dis_real_loss = torch.mean(torch.abs((dis_real - zero)))
-            
-            dis_fake_sel = torch.nn.ReLU()(dis_fake - torch.mean(dis_real))
-            dis_fake_sel_loss = torch.mean(torch.abs(dis_fake_sel - one))
-
-            sel_images = dis_fake_sel * images + (1.0 - dis_fake_sel) * outputs.detach()
-            dis_fake_loss = torch.mean(torch.abs((sel_images - images)))
-             
-            disparity = torch.abs(images - outputs.detach())
-            disp_loss = torch.mean(torch.abs((dis_fake - self.config.DISP_WEIGHT * disparity)))
-
-            dis_loss += (self.config.REAL_LOSS_WEIGHT * dis_real_loss  
-            + self.config.FAKE_LOSS_WEIGHT * dis_fake_loss 
-            + self.config.FAKE_REL_LOSS_WEIGHT * dis_fake_sel_loss 
-            + self.config.DISP_LOSS_WEIGHT * disp_loss)
-
-        elif self.config.GAN_loss == 'rs_proposed_noavg':
+        elif self.config.GAN_loss == 'rs_proposed':
             
             zero = torch.zeros_like(dis_real,requires_grad=False)            
             one = torch.ones_like(dis_fake,requires_grad = False)
@@ -358,106 +330,6 @@ class InpaintingModel(BaseModel):
 
             dis_loss += (dis_real_loss_enc + dis_fake_loss_enc)
 
-        elif self.config.GAN_loss == 'rs_proposed_sample_noavg':
-            
-            zero = torch.zeros_like(dis_real,requires_grad=False)            
-            one = torch.ones_like(dis_fake,requires_grad = False)
-
-#           normal relativistic loss is not used for fake part since it is considered when calculating the loss    
-
-            dis_real = torch.nn.ReLU()(1.0 + (dis_real - dis_fake))
-            dis_real_loss = torch.mean(torch.abs((dis_real - zero)))
-            
-            dis_fake_sel = torch.nn.ReLU()(dis_fake - dis_real)
- 
-            dis_fake_sel_loss = torch.mean(torch.abs(dis_fake_sel - one))
-
-            sel_images = dis_fake_sel * images + (1.0 - dis_fake_sel) * outputs.detach()
-            dis_fake_loss = torch.mean(torch.abs((sel_images - images)))
-             
-            disparity = torch.abs(images - outputs.detach())
-            disp_loss = torch.mean(torch.abs((dis_fake - self.config.DISP_WEIGHT * disparity)))
-
-################################# encoder loss part ########################################
-            zero = torch.zeros_like(dis_real_enc,requires_grad=False)            
-            one = torch.ones_like(dis_fake_enc,requires_grad = False)
-
-
-            dis_real_enc = torch.nn.ReLU()(1.0 + (dis_real_enc - torch.mean(dis_fake_enc)))
-            dis_real_loss_enc = torch.mean(torch.abs((dis_real_enc - zero)))
-            
-            dis_fake_sel_enc = torch.nn.ReLU()(dis_fake_enc - torch.mean(dis_real_enc))
-            dis_fake_sel_loss_enc = torch.mean(torch.abs(dis_fake_sel_enc - one))
-
-            dis_fake_sel_enc = dis_fake_sel_enc.unsqueeze(1).unsqueeze(1)
-            sel_images_enc = dis_fake_sel_enc * images + (1.0 - dis_fake_sel_enc) * outputs.detach()
-            dis_fake_loss_enc = torch.mean(torch.abs((sel_images_enc - images)))
-             
-            disparity_enc = torch.mean(torch.abs(images - outputs.detach()))
-            disp_loss_enc = torch.mean(torch.abs((torch.mean(dis_fake_enc) - self.config.DISP_WEIGHT * disparity_enc)))
-
- 
-            dis_loss += (self.config.REAL_LOSS_WEIGHT * dis_real_loss  
-            + self.config.FAKE_LOSS_WEIGHT * dis_fake_loss 
-            + self.config.FAKE_REL_LOSS_WEIGHT * dis_fake_sel_loss 
-            + self.config.DISP_LOSS_WEIGHT * disp_loss)
-
-            dis_loss += (self.config.REAL_LOSS_WEIGHT * dis_real_loss_enc  
-            + self.config.FAKE_LOSS_WEIGHT * dis_fake_loss_enc 
-            + self.config.FAKE_REL_LOSS_WEIGHT * dis_fake_sel_loss_enc 
-            + self.config.DISP_LOSS_WEIGHT * disp_loss_enc)
-        
-        elif self.config.GAN_loss == 'rs_proposed_sample':
-            
-            zero = torch.zeros_like(dis_real,requires_grad=False)            
-            one = torch.ones_like(dis_fake,requires_grad = False)
-
-#           normal relativistic loss is not used for fake part since it is considered when calculating the loss    
-
-#            dis_real = torch.nn.ReLU()(1.0 + (dis_real - torch.mean(dis_fake)))
-            dis_real = dis_real
-            dis_real_loss = torch.mean(torch.abs((dis_real - zero)))
-            
-            dis_fake_sel = dis_fake
-#            dis_fake_sel = torch.nn.ReLU()(dis_fake - torch.mean(dis_real))
-            dis_fake_sel_loss = torch.mean(torch.abs(dis_fake_sel - one))
-
-            sel_images = dis_fake_sel * images + (1.0 - dis_fake_sel) * outputs.detach()
-            dis_fake_loss = torch.mean(torch.abs((sel_images - images)))
-             
-            disparity = torch.abs(images - outputs.detach())
-            disp_loss = torch.mean(torch.abs((dis_fake - self.config.DISP_WEIGHT * disparity)))
-
-################################# encoder loss part ########################################
-            zero = torch.zeros_like(dis_real_enc,requires_grad=False)            
-            one = torch.ones_like(dis_fake_enc,requires_grad = False)
-
-
-            dis_real_enc = dis_real_enc
-#            dis_real_enc = torch.nn.ReLU()(1.0 + (dis_real_enc - torch.mean(dis_fake_enc)))
-            dis_real_loss_enc = torch.mean(torch.abs((dis_real_enc - zero)))
-            
-            dis_fake_sel_enc = dis_fake_enc
-#            dis_fake_sel_enc = torch.nn.ReLU()(dis_fake_enc - torch.mean(dis_real_enc))
-            dis_fake_sel_loss_enc = torch.mean(torch.abs(dis_fake_sel_enc - one))
-
-            dis_fake_sel_enc = dis_fake_sel_enc.unsqueeze(1).unsqueeze(1)
-            sel_images_enc = dis_fake_sel_enc * images + (1.0 - dis_fake_sel_enc) * outputs.detach()
-            dis_fake_loss_enc = torch.mean(torch.abs((sel_images_enc - images)))
-             
-            disparity_enc = torch.mean(torch.abs(images - outputs.detach()))
-            disp_loss_enc = torch.mean(torch.abs((torch.mean(dis_fake_enc) - self.config.DISP_WEIGHT * disparity_enc)))
-
- 
-            dis_loss += (self.config.REAL_LOSS_WEIGHT * dis_real_loss  
-            + self.config.FAKE_LOSS_WEIGHT * dis_fake_loss 
-            + self.config.FAKE_REL_LOSS_WEIGHT * dis_fake_sel_loss 
-            + self.config.DISP_LOSS_WEIGHT * disp_loss)
-
-            dis_loss += (self.config.REAL_LOSS_WEIGHT * dis_real_loss_enc  
-            + self.config.FAKE_LOSS_WEIGHT * dis_fake_loss_enc 
-            + self.config.FAKE_REL_LOSS_WEIGHT * dis_fake_sel_loss_enc 
-            + 0 * disp_loss_enc)
             
         elif self.config.GAN_loss == 'rasgan_aver_lsgan':
             dis_real_loss = torch.mean((dis_real - torch.mean(dis_fake) - 1.0)**2) 
@@ -471,10 +343,6 @@ class InpaintingModel(BaseModel):
         if (self.config.GAN_loss == 'UNET') :
             gen_fake_dec, gen_fake_enc = self.discriminator(outputs)                    # in: [rgb(3)]
         elif (self.config.GAN_loss == 'rs_proposed_unet') :
-            gen_fake, gen_fake_enc = self.discriminator(outputs)                    # in: [rgb(3)]
-        elif (self.config.GAN_loss == 'rs_proposed_sample') :
-            gen_fake, gen_fake_enc = self.discriminator(outputs)                    # in: [rgb(3)]
-        elif (self.config.GAN_loss == 'rs_proposed_sample_noavg') :
             gen_fake, gen_fake_enc = self.discriminator(outputs)                    # in: [rgb(3)]
         else:
             gen_fake, _ = self.discriminator(outputs)                    # in: [rgb(3)]
@@ -490,24 +358,11 @@ class InpaintingModel(BaseModel):
             gen_gan_loss = torch.mean(torch.abs((gen_fake)))
             gen_loss += gen_gan_loss * self.config.INPAINT_ADV_LOSS_WEIGHT
         
-        elif self.config.GAN_loss == 'rs_proposed_noavg':
-
-            gen_gan_loss = torch.mean(torch.abs((gen_fake)))
-            gen_loss += gen_gan_loss * self.config.INPAINT_ADV_LOSS_WEIGHT
-        
         elif self.config.GAN_loss == 'rs_proposed_unet':
             gen_gan_loss_enc = self.adversarial_loss(gen_fake_enc,False,False) * self.config.INPAINT_ADV_LOSS_WEIGHT
             gen_gan_loss = torch.mean(torch.abs((gen_fake)))
             gen_loss += (gen_gan_loss + gen_gan_loss_enc) * self.config.INPAINT_ADV_LOSS_WEIGHT
 #            gen_loss += (gen_gan_loss) * self.config.INPAINT_ADV_LOSS_WEIGHT
-        elif self.config.GAN_loss == 'rs_proposed_sample':
-            gen_gan_loss_enc = torch.mean(torch.abs((gen_fake_enc)))
-            gen_gan_loss = torch.mean(torch.abs((gen_fake)))
-            gen_loss += (gen_gan_loss + gen_gan_loss_enc) * self.config.INPAINT_ADV_LOSS_WEIGHT
-        elif self.config.GAN_loss == 'rs_proposed_sample_noavg':
-            gen_gan_loss_enc = torch.mean(torch.abs((gen_fake_enc)))
-            gen_gan_loss = torch.mean(torch.abs((gen_fake)))
-            gen_loss += (gen_gan_loss + gen_gan_loss_enc) * self.config.INPAINT_ADV_LOSS_WEIGHT
         
         elif (self.config.GAN_loss == 'hinge') or (self.config.GAN_loss == 'nsgan') or (self.config.GAN_loss == 'lsgan'):
             gen_gan_loss = self.adversarial_loss(gen_fake,True,False) * self.config.INPAINT_ADV_LOSS_WEIGHT
@@ -519,7 +374,6 @@ class InpaintingModel(BaseModel):
             gen_gan_loss = ( gen_gan_loss_enc + gen_gan_loss_dec)
 
             gen_loss += gen_gan_loss
-
 
         elif self.config.GAN_loss == 'rasgan_aver_lsgan':
             gen_real, _ = self.discriminator(images) 
