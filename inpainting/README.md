@@ -2,14 +2,13 @@
 
 This repository contains the code of the AAGAN for inpainting.
 
-## 1. How to reproduce results of the paper
+## 1. Installation
 
 For inpainting, we used [Edge-connect](https://github.com/knazeri/edge-connect) as a baseline.
-Refer to [Edge-connect](https://github.com/knazeri/edge-connect) for details regarding installation. 
-Experiment environment 
+Refer to [Edge-connect](https://github.com/knazeri/edge-connect) for details regarding environment 
 
-### Installation
-* Install dependencies by referring to [Edge-connect](https://github.com/knazeri/edge-connect) or **environment.yml** ).
+### Dependencies
+* Install dependencies by referring to [Edge-connect](https://github.com/knazeri/edge-connect) or **environment.yml** .
 
 ### Prepare datasets
 #### 1) images
@@ -25,24 +24,23 @@ Details about pre-processing dataset can be found in [Edge-connect](https://gith
 ## 2. Quick start
 Here, we explain how to execute simple demo.
 
-The images in **demo_image** folder is cropped from PCGAN's official youtube. [Paper](https://arxiv.org/abs/1710.10196)|[code](https://github.com/tkarras/progressive_growing_of_gans)|[presentation(youtube)](https://youtu.be/G06dEcZ-QTg).
+The images in **demo_image** folder is extracted from PCGAN's official youtube. [Paper](https://arxiv.org/abs/1710.10196)|[code](https://github.com/tkarras/progressive_growing_of_gans)|[presentation(youtube)](https://youtu.be/G06dEcZ-QTg).
 
 
-1. Prepare data file list
-Make image flist.
+1. Make image flist.
 ~~~bash
 python3 scripts/flist.py --path ./demo_image/ --output ./datasets/demo.flist
 ~~~
-Make mask flist(download them from the link above).
+2. Make mask flist (download the masks from the link above).
 ~~~bash
 python3 scripts/flist.py --path [Mask_path] --output ./datasets/MASK.flist
 ~~~
-2. Extract image from the pre-trained model.
+3. Extract image from the pre-trained model.
 ~~~bash
 python3 test.py --model 3 --checkpoints ./checkpoints/Sample
 ~~~
 
-Then, the results will be saved in checkpoints/Sample/results folder. 
+Then, the results will be saved in **checkpoints/Sample/results** folder. 
 
 
 ## 3. Getting Started
