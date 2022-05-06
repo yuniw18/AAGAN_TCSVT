@@ -1,0 +1,7 @@
+./
+/
+./checkpoints
+./datasets
+./mask
+*.out
+*.pyc
