@@ -9,30 +9,29 @@ This repository contains the code of the paper
 
 
 ## Introduction
-![demo](./checkpoints/Sample/AAGAN_demo.gif)
+![demo](./AAGAN_demo.gif)
 
-* Ground truth: results of PCGAN(cropped from [presentation(youtube)](https://youtu.be/G06dEcZ-QTg),  
+* Ground truth: results of PCGAN (cropped from [presentation(youtube)](https://youtu.be/G06dEcZ-QTg),  
 * Input: [testing irregular mask datasets](http://masc.cs.gmu.edu/wiki/partialconv),  
-* edge-connect: Results when trained using SNGAN,  
-* edge-connect*: Results when trained using AAGAN.
+* edge-connect: Results of the generator trained using SNGAN,  
+* edge-connect*: Results of the generator trained using AAGAN.
 
-The above demo shows some strengths when AAGAN is applied to inpainting. The boundary of masked region is visible in Edge-connect, while rarely visible in Edge-connect*. This implies that discriminator of SNGAN doesn't care about objective quality which changes the oveall tone of the faces as a result. We believe that our work will give an insight to people who studies the image generation area where objective quality should be concerned. 
+The demo shows the strength of AAGAN when applied to inpainting task. The boundaries of the masked region are noticeble in the results of Edge-connect which degrades the objective and subjective quality. Meanhwhile, boundaries of the mask are rarely visible in the results of Edge-connect* which implies that the proposed discriminator mitigates the trade-off between qualities.
 
 
 ## 1. How to implement to your own network
 
 ### prerequisites
 
-Because our method is about a loss function, it is easily applicable to any other method if conditions below are met.
+Because our method is about a loss function of the discriminator, it is easily applicable to any other method if conditions below are met.
 
-* Auto-encoder based discriminator
+* Auto-encoder like discriminator
 * Conditional Image generation tasks where ground truth exists, e.g. inpainting.
 
-Since our method utilizes pixel-wise differences between samples, image generation tasks of fitting data distribution(i.e., unsupervised learning) only is not appropriate.
 Note that, auto-encoder discriminator should output value range from 0 to 1.
 
 ### Implementation
-To implement an AAGAN to your project, modify the code where GAN loss is caculated as follows.
+To implement an AAGAN to your project, modify the code where GAN loss is caculated as follows with the auto-encoder like discriminator.
 
 * Accuracy-aware Discriminator
 
@@ -58,20 +57,20 @@ dis_loss += (dis_real_loss  + dis_fake_loss  +  disp_loss)  # dis_loss -> loss o
 zero = torch.zeros_like(dis_real,requires_grad=False)
 one = torch.ones_like(dis_fake,requires_grad = False)
 
-dis_real = torch.nn.ReLU()(1.0 + (dis_real - torch.mean(dis_fake)))
-dis_real_loss = torch.mean(torch.abs((dis_real - zero)))                      # relativistic loss for real part
+dis_real = torch.nn.ReLU()(1.0 + (dis_real - torch.mean(dis_fake)))           # E_real
+dis_real_loss = torch.mean(torch.abs((dis_real - zero)))                      # D'_real
 
-dis_fake_sel = torch.nn.ReLU()(dis_fake - torch.mean(dis_real))
-dis_fake_sel_loss = torch.mean(torch.abs(dis_fake_sel - one))                 # relativistic loss for fake part
-
+dis_fake_sel = torch.nn.ReLU()(dis_fake - torch.mean(dis_real))               # E_fake
 sel_images = dis_fake_sel * images + (1.0 - dis_fake_sel) * outputs.detach()
-dis_fake_loss = torch.mean(torch.abs((sel_images - images)))                  # lowered criterion part 
+
+
+dis_fake_loss = torch.mean(torch.abs((sel_images - images)))                  # D'_fake
 
 disparity = torch.abs(images - outputs.detach())
-disp_loss = torch.mean(torch.abs((dis_fake - self.reg * disparity))) # regularization
+disp_loss = torch.mean(torch.abs((dis_fake - self.reg * disparity)))          # D_reg
 
 # Hyper parameters for each losses are ommitted here. Plaese set this manually.
-dis_loss += (dis_real_loss  + dis_fake_loss + dis_fake_sel_loss + disp_loss) # dis_loss -> loss of discriminator and should be backward later
+dis_loss += (dis_real_loss  + dis_fake_loss +  disp_loss) # dis_loss -> loss of discriminator and should be backward later
 ~~~
 
 * Generator
