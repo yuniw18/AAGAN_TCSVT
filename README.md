@@ -42,15 +42,18 @@ To implement an AAGAN to your project, modify the code where GAN loss is caculat
 #dis_fake,_ self.discriminator(dis_input_fake)
 
 zero = torch.zeros_like(dis_real,requires_grad=False)            
-dis_real_loss = torch.mean(torch.abs((dis_real - zero)))
+dis_real_loss = torch.mean(torch.abs((dis_real - zero)))                      # D_real
 
 sel_images = dis_fake * images + (1.0 - dis_fake) * outputs.detach()
-dis_fake_loss = torch.mean(torch.abs((sel_images - images)))
+dis_fake_loss = torch.mean(torch.abs((sel_images - images)))                  # D_fake
 
 disparity = torch.abs(images - outputs.detach())
-disp_loss = torch.mean(torch.abs((dis_fake - self.reg * disparity))) # self.reg -> weight of the disparity.
+disp_loss = torch.mean(torch.abs((dis_fake - disparity)))                     # D_reg
 
+
+# Hyper parameters for each losses are ommitted here. Plaese set this manually.
 dis_loss += (dis_real_loss  + dis_fake_loss  +  disp_loss)  # dis_loss -> loss of discriminator and should be backward later
+
 ~~~
 * Relativistic Accuracy-aware Discriminator
 ~~~python
