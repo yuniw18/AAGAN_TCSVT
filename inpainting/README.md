@@ -22,7 +22,7 @@ We used [testing irregular mask datasets](http://masc.cs.gmu.edu/wiki/partialcon
 Details about pre-processing dataset can be found in [Edge-connect](https://github.com/knazeri/edge-connect).
 
 ## 2. Quick start
-Here, we explain how to execute simple demo.
+Here, we explain how to execute simple demo, which can reproduce the results in Multimedia Appendix.
 
 The images in **demo_image** folder is extracted from PCGAN's official youtube. [Paper](https://arxiv.org/abs/1710.10196)|[code](https://github.com/tkarras/progressive_growing_of_gans)|[presentation(youtube)](https://youtu.be/G06dEcZ-QTg).
 
