@@ -1,11 +1,11 @@
 # Inpainting
 
-This repository contains the code of the AAGAN for inpainting.
+This repository contains the code of inpainting with an AAGAN.
 
 ## 1. Installation
 
 For inpainting, we used [Edge-connect](https://github.com/knazeri/edge-connect) as a baseline.
-Refer to [Edge-connect](https://github.com/knazeri/edge-connect) for details regarding environment 
+Refer to [Edge-connect](https://github.com/knazeri/edge-connect) for details abount installation.
 
 ### Dependencies
 * Install dependencies by referring to [Edge-connect](https://github.com/knazeri/edge-connect) or **environment.yml** .
@@ -31,7 +31,7 @@ The images in **demo_image** folder is extracted from PCGAN's official youtube. 
 ~~~bash
 python3 scripts/flist.py --path ./demo_image/ --output ./datasets/demo.flist
 ~~~
-2. Make mask flist (download the masks from the link above).
+2. Make mask flist (Download the mask data from the link above).
 ~~~bash
 python3 scripts/flist.py --path [Mask_path] --output ./datasets/MASK.flist
 ~~~
@@ -46,17 +46,7 @@ Then, the results will be saved in **checkpoints/Sample/results** folder.
 ## 3. Getting Started
 ### 1) Set model configuration
 Most of the configuration is same with [Edge-connect](https://github.com/knazeri/edge-connect).
-
-* **USE_SPEC**: *True* -> use spectral normalization for discriminator. *False* -> None.
-* **AUTO**: *True* -> Use auto-encoder based discriminator. *False* -> Use normal discriminator.
-* **GAN_LOSS**: 
-                *hinge,nsgan,lsgan* -> set loss function according to each configuration.  
-                *rasgan_aver_lsgan* -> set loss function with ragan which uses least square error.                
-                *proposed* -> set loss function with AAGAN.  
-                *rs_proposed* -> set loss function with RAAGAN.  
-
-
-For example, if configuration is set as **USE_SPEC** : *True*, **AUTO** : *False* and  **GAN_LOSS** : *lsgan*, GAN loss will be least square error with spectral normalization(SN-lsgan). Sample configuration is included in **./checkpoints/SAMPLE/config.yml**
+For more details, refer to the sample configuration included in **./checkpoints/SAMPLE/config.yml**
 
 ### 2) Training
 We used pre-trained model for fast convergence. Download pre-trained model at [Edge-connect](https://github.com/knazeri/edge-connect).
