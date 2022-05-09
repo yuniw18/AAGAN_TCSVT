@@ -6,7 +6,11 @@ We used [DAIN](https://github.com/baowenbo/DAIN) as a baseline.
 
 ### 1. Instalation
 
-Please refer to [DAIN](https://github.com/baowenbo/DAIN) for details about prerequisites or installation. 
+Please refer to [DAIN](https://github.com/baowenbo/DAIN) for details about prerequisites or installation.
+Due to capacity limit, some codes and pre-trained model are not inculded here.
+You should download additional code (e.g., MegaDepth, PWCNet) with pre-trained model from [DAIN](https://github.com/baowenbo/DAIN), and build Pytorch Extensions following their instructions to excute the code below.
+We recommend to build an environment starting from [DAIN](https://github.com/baowenbo/DAIN).
+
 
 ### 2. Datasets
 #### 1) Training datasets
