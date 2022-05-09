@@ -31,7 +31,7 @@ Because our method is about a loss function of the discriminator, it is easily a
 Note that, auto-encoder discriminator should output value range from 0 to 1.
 
 ### Implementation
-To implement an AAGAN to your project, modify the code where GAN loss is caculated as follows with the auto-encoder like discriminator.
+To implement an AAGAN to your project, modify the code where GAN loss is caculated as follows.
 
 * Accuracy-aware Discriminator
 
@@ -60,17 +60,17 @@ dis_loss += (dis_real_loss  + dis_fake_loss  +  disp_loss)  # dis_loss -> loss o
 zero = torch.zeros_like(dis_real,requires_grad=False)
 one = torch.ones_like(dis_fake,requires_grad = False)
 
-dis_real = torch.nn.ReLU()(1.0 + (dis_real - torch.mean(dis_fake)))           # E_real
+dis_real = torch.nn.ReLU()(1.0 + (dis_real - dis_fake))                       # E_real
 dis_real_loss = torch.mean(torch.abs((dis_real - zero)))                      # D'_real
 
-dis_fake_sel = torch.nn.ReLU()(dis_fake - torch.mean(dis_real))               # E_fake
+dis_fake_sel = torch.nn.ReLU()(dis_fake - dis_real)                           # E_fake
 sel_images = dis_fake_sel * images + (1.0 - dis_fake_sel) * outputs.detach()
 
 
 dis_fake_loss = torch.mean(torch.abs((sel_images - images)))                  # D'_fake
 
 disparity = torch.abs(images - outputs.detach())
-disp_loss = torch.mean(torch.abs((dis_fake - self.reg * disparity)))          # D_reg
+disp_loss = torch.mean(torch.abs((dis_fake - disparity)))                     # D_reg
 
 # Hyper parameters for each losses are ommitted here. Plaese set this manually.
 dis_loss += (dis_real_loss  + dis_fake_loss +  disp_loss) # dis_loss -> loss of discriminator and should be backward later
@@ -82,7 +82,8 @@ dis_loss += (dis_real_loss  + dis_fake_loss +  disp_loss) # dis_loss -> loss of 
 
 gen_fake,_ = self.discriminator(outputs)
 gen_gan_loss = torch.mean(torch.abs((gen_fake)))
-gen_loss += gen_gan_loss * self.config.INPAINT_ADV_LOSS_WEIGHT
+# Pixel-wise loss is ommitted here. Plaese set this manually.
+gen_loss += gen_gan_loss 
 
 ~~~
 
