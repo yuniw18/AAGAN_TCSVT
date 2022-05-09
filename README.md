@@ -16,7 +16,7 @@ This repository contains the code of the paper
 * edge-connect: Results of the generator trained using SNGAN,  
 * edge-connect*: Results of the generator trained using AAGAN.
 
-The demo shows the strength of AAGAN when applied to inpainting task. The boundaries of the masked region are noticeble in the results of Edge-connect which degrades the objective and subjective quality. Meanhwhile, boundaries of the mask are rarely visible in the results of Edge-connect* which implies that the proposed discriminator mitigates the trade-off between qualities.
+The demo shows the effect of AAGAN when applied to inpainting task. The boundaries of the masked region are noticeble in the results of Edge-connect which degrades the objective and subjective quality. Meanhwhile, boundaries of the mask are rarely visible in the results of Edge-connect* which implies that the proposed discriminator mitigates the trade-off between qualities.
 
 
 ## 1. How to implement to your own network
@@ -92,7 +92,7 @@ After caculating loss, backward and optimize according to your code.
 
 ## 2. Reproduction
 
-To reproduce the results in the paper, follow the instructions contained in each folder (inpainting, FRUC).
+To reproduce the results in the paper or Multimedia Appendix, follow the instructions included in each folder (**inpainting**, **FRUC**).
 
 
 ## Citation
