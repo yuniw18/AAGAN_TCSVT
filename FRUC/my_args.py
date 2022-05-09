@@ -18,7 +18,7 @@ def boolean_string(s):
         raise ValueError('Not a valid boolean string')
     return s == 'True'
 
-parser.add_argument('--GAN_loss', type=str,default ='proposed' , help='Set GAN_loss')
+parser.add_argument('--GAN_loss', type=str,default ='proposed' , help='Set GAN_loss') # proposed -> AAGAN, rs_proposed -> RAAGAN / for others, refer to train.py
 parser.add_argument('--USE_SPEC', default =True,type=boolean_string,help='Set Spectral normalization')
 parser.add_argument('--Auto', default =True ,type=boolean_string,help='Set discriminator architecture')
 parser.add_argument('--Fine_Tuning', type=boolean_string,default =True , help='If true, train only rectifyNet')
@@ -28,22 +28,9 @@ parser.add_argument('--MULTI_FRAME', type=boolean_string,default =False , help='
 parser.add_argument('--DISP_WEIGHT', type=float,default =1.0 , help='Set discriminator disparity ratio')
 parser.add_argument('--FAKE_LOSS_WEIGHT', type=float,default = 1 , help='Set discriminator fake loss ratio')
 parser.add_argument('--DISP_LOSS_WEIGHT', type=float,default =1 , help='Set discriminator disparity loss ratio')
-parser.add_argument('--FAKE_REL_LOSS_WEIGHT', type=float,default =1 , help='Set discriminator disparity loss ratio')
+parser.add_argument('--FAKE_REL_LOSS_WEIGHT', type=float,default =0 , help='Set discriminator disparity loss ratio')
 parser.add_argument('--TESTDATA_PATH', type=str,default = '/hdd/yuniw/UCF/data/test/' , help='Path where test images exist')
 parser.add_argument('--test_uid', type=str,default = None , help='Path where test images exist')
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 parser.add_argument('--debug',action = 'store_true', help='Enable debug mode')
 parser.add_argument('--netName', type=str, default='DAIN',

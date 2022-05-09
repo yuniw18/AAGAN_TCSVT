@@ -297,11 +297,11 @@ def train():
                 zero = torch.zeros_like(dis_real,requires_grad=False)            
                 one = torch.ones_like(dis_fake,requires_grad = False)
                 
-                dis_real = torch.nn.ReLU()(1.0 + (dis_real - torch.mean(dis_fake)))
+                dis_real = torch.nn.ReLU()(1.0 + (dis_real dis_fake))
                 dis_real_loss = torch.mean(torch.abs((dis_real - zero)))
             
-                dis_fake_sel = torch.nn.ReLU()(dis_fake - torch.mean(dis_real))
-                dis_fake_sel_loss = torch.mean(torch.abs((dis_fake_sel - one))) 
+                dis_fake_sel = torch.nn.ReLU()(dis_fake - dis_real)
+                dis_fake_sel_loss = torch.mean(torch.abs((dis_fake_sel - one))) # Not used
 
                 sel_images = dis_fake_sel * images + (1.0 - dis_fake_sel) * outputs.detach()
                 dis_fake_loss = torch.mean(torch.abs((sel_images - images)))
@@ -311,7 +311,7 @@ def train():
 
                 dis_loss += (dis_real_loss  
                 + args.FAKE_LOSS_WEIGHT * dis_fake_loss 
-                + args.FAKE_REL_LOSS_WEIGHT * dis_fake_sel_loss 
+                + args.FAKE_REL_LOSS_WEIGHT * dis_fake_sel_loss  # Not used 
                 + args.DISP_LOSS_WEIGHT * disp_loss)
 
                 dis_optimizer.zero_grad()
