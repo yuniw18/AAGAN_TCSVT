@@ -5,7 +5,7 @@ This repository contains the code of the paper
 >
 >Ilwi Yun, Hyuk-Jae Lee, Chae Eun Rhee.
 >
-> IEEE transactions on Circuits and Systems for Video Technology, 2022
+> IEEE transactions on Circuits and Systems for Video Technology (TCSVT), 2022
 
 
 ## Introduction
