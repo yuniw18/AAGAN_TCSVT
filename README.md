@@ -1,11 +1,11 @@
 # AAGAN
 
 This repository contains the code of the paper 
-> AAGAN: Accuracy-Aware Generative Adversarial Network for supervised tasks
+> [AAGAN: Accuracy-Aware Generative Adversarial Network for Supervised tasks](https://ieeexplore.ieee.org/abstract/document/9770060)
 >
 >Ilwi Yun, Hyuk-Jae Lee, Chae Eun Rhee.
 >
-> IEEE transactions on Circuits and Systems for Video Technology
+> IEEE transactions on Circuits and Systems for Video Technology, 2022
 
 
 ## Introduction
@@ -96,7 +96,15 @@ To reproduce the results in the paper or Multimedia Appendix, follow the instruc
 
 
 ## Citation
-Will be updated soon.
+```
+@article{yun2022aagan,
+  title={AAGAN: Accuracy-Aware Generative Adversarial Network for supervised tasks},
+  author={Yun, Ilwi and Lee, Hyuk-Jae and Rhee, Chae Eun},
+  journal={IEEE Transactions on Circuits and Systems for Video Technology},
+  year={2022},
+  publisher={IEEE}
+}
+``` 
 
 ## License
 Our contributions on codes are released under the MIT license. For the codes of the otehr works, refer to their repositories.
